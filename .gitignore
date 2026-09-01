@@ -1,0 +1,10 @@
+node_modules
+.pnpm-store
+dist
+bridge
+tmp
+playwright-report
+test-results
+coverage
+.DS_Store
+*.local
