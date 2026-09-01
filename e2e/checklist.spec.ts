@@ -109,3 +109,34 @@ test("has no automatically detectable critical accessibility violations", async 
     ),
   ).toEqual([]);
 });
+
+test("opens the consent material and moves through its carousel", async ({ page }) => {
+  await page.goto("/#/materials/consent");
+
+  await expect(
+    page.getByRole("heading", { name: "Що важливо знати про згоду" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("progressbar", { name: "Складова 1 із 5" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Далі" }).click();
+
+  await expect(
+    page.getByRole("heading", { name: "2. Чітка й поінформована" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Наступне" }),
+  ).toHaveAttribute("href", "#/materials/sex-myths");
+
+  await page.addScriptTag({ content: axe.source });
+  const result = await page.evaluate(() =>
+    (window as unknown as WindowWithAxe).axe.run(document),
+  );
+
+  expect(
+    result.violations.filter((violation) =>
+      ["critical", "serious"].includes(violation.impact ?? ""),
+    ),
+  ).toEqual([]);
+});

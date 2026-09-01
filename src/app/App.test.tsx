@@ -54,3 +54,37 @@ describe("checklist flow", () => {
     });
   });
 });
+
+describe("consent material", () => {
+  it("shows the full material structure and moves through the consent carousel", async () => {
+    const user = userEvent.setup();
+    renderApp("/materials/consent");
+
+    expect(
+      screen.getByRole("heading", { name: "Що важливо знати про згоду" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("progressbar", { name: "Складова 1 із 5" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "1. Вільна й добровільна" }),
+    ).toBeVisible();
+
+    await user.click(screen.getByRole("button", { name: "Далі" }));
+
+    expect(
+      screen.getByRole("progressbar", { name: "Складова 2 із 5" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "2. Чітка й поінформована" }),
+    ).toBeVisible();
+    expect(screen.getByRole("link", { name: "Зміст" })).toHaveAttribute(
+      "href",
+      "/materials",
+    );
+    expect(screen.getByRole("link", { name: "Наступне" })).toHaveAttribute(
+      "href",
+      "/materials/sex-myths",
+    );
+  });
+});

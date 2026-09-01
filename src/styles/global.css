@@ -734,6 +734,220 @@ h1 {
   text-decoration: none;
 }
 
+.material-article-shell {
+  min-height: 100svh;
+}
+
+.material-article-page {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 42px 20px max(64px, env(safe-area-inset-bottom));
+}
+
+.material-article-intro h1 {
+  max-width: 13ch;
+  font-size: clamp(2.55rem, 11vw, 4.6rem);
+}
+
+.material-article-intro h1:focus {
+  outline: none;
+}
+
+.material-lead {
+  display: grid;
+  gap: 14px;
+  max-width: 62ch;
+  margin-top: 26px;
+  color: var(--muted);
+  font-size: 1.04rem;
+  line-height: 1.62;
+}
+
+.material-lead p {
+  margin: 0;
+}
+
+.material-toc {
+  display: grid;
+  gap: 10px;
+  margin-top: 36px;
+}
+
+.material-toc button {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 58px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 14px 16px;
+  color: var(--text);
+  background: var(--surface);
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    transform 160ms ease,
+    background-color 160ms ease;
+}
+
+.material-toc button:hover {
+  border-color: #aaa99f;
+  background: #f8f7f2;
+}
+
+.material-toc button:active {
+  transform: translateY(1px);
+}
+
+.material-toc button span:last-child {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.material-section {
+  margin-top: 70px;
+}
+
+.material-section h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 7.5vw, 2.65rem);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  scroll-margin-top: 24px;
+  text-wrap: balance;
+}
+
+.material-section h2:focus {
+  outline: 3px solid var(--focus);
+  outline-offset: 5px;
+  border-radius: 4px;
+}
+
+.consent-carousel {
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 20px;
+  background: var(--surface);
+}
+
+.consent-carousel-progress-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.consent-carousel-count {
+  min-width: 42px;
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.consent-carousel-progress {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-muted);
+}
+
+.consent-carousel-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width 180ms ease;
+}
+
+.consent-carousel-slide {
+  margin-top: 24px;
+}
+
+.consent-carousel-slide h3 {
+  margin: 0;
+  font-size: clamp(1.4rem, 6.5vw, 1.9rem);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+}
+
+.consent-carousel-slide p {
+  margin: 16px 0 0;
+  line-height: 1.62;
+}
+
+.consent-carousel-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.primary-button:disabled,
+.secondary-button:disabled {
+  border-color: var(--border);
+  color: var(--muted);
+  background: var(--surface-muted);
+  cursor: not-allowed;
+  opacity: 0.68;
+  transform: none;
+}
+
+.material-prose > p,
+.material-prose > ul {
+  max-width: 64ch;
+  font-size: 1.02rem;
+  line-height: 1.68;
+}
+
+.material-prose > p {
+  margin: 18px 0 0;
+}
+
+.material-prose > ul {
+  display: grid;
+  gap: 12px;
+  margin: 24px 0 0;
+  padding-left: 24px;
+}
+
+.material-quote-list {
+  display: grid;
+  gap: 10px;
+  max-width: 620px;
+  margin: 24px 0;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 16px 16px 0;
+  padding: 18px 18px 18px 20px;
+  background: rgba(255, 254, 250, 0.68);
+}
+
+.material-quote-list p {
+  margin: 0;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.material-pagination {
+  display: grid;
+  gap: 10px;
+  margin-top: 76px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+
+.material-pagination a {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  text-decoration: none;
+}
+
 @keyframes start-exit-up {
   to {
     opacity: 0;
@@ -819,6 +1033,14 @@ h1 {
 
   .repeat-button {
     width: auto;
+  }
+
+  .material-toc {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .material-pagination {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

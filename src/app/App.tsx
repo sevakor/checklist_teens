@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { ChecklistProvider } from "../features/checklist/ChecklistContext";
 import { ChecklistPage } from "../pages/ChecklistPage";
 import { CompletionPage } from "../pages/CompletionPage";
+import { ConsentMaterialPage } from "../pages/ConsentMaterialPage";
 import { EntryRedirect } from "../pages/EntryRedirect";
 import { MaterialPlaceholderPage } from "../pages/MaterialPlaceholderPage";
 import { MaterialsCatalog } from "../pages/MaterialsCatalog";
@@ -22,6 +23,7 @@ export function App() {
         <Route path="/checklist/:step" element={<ChecklistRoute />} />
         <Route path="/complete" element={<CompletionPage />} />
         <Route path="/materials" element={<MaterialsCatalog />} />
+        <Route path="/materials/consent" element={<ConsentMaterialPage />} />
         <Route
           path="/materials/:materialSlug"
           element={<MaterialPlaceholderPage />}
