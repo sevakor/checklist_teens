@@ -767,47 +767,6 @@ h1 {
   margin: 0;
 }
 
-.material-toc {
-  display: grid;
-  gap: 10px;
-  margin-top: 36px;
-}
-
-.material-toc button {
-  display: flex;
-  gap: 16px;
-  justify-content: space-between;
-  align-items: center;
-  min-height: 58px;
-  border: 1px solid var(--border);
-  border-radius: 15px;
-  padding: 14px 16px;
-  color: var(--text);
-  background: var(--surface);
-  font-weight: 700;
-  line-height: 1.35;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 160ms ease,
-    transform 160ms ease,
-    background-color 160ms ease;
-}
-
-.material-toc button:hover {
-  border-color: #aaa99f;
-  background: #f8f7f2;
-}
-
-.material-toc button:active {
-  transform: translateY(1px);
-}
-
-.material-toc button span:last-child {
-  color: var(--accent);
-  font-size: 1.1rem;
-}
-
 .material-section {
   margin-top: 70px;
 }
@@ -833,7 +792,7 @@ h1 {
   scroll-margin-top: 20px;
 }
 
-.material-toc + .material-disclosure-section {
+.material-article-intro + .material-disclosure-section {
   margin-top: 64px;
   border-top: 1px solid var(--border);
 }
@@ -1094,10 +1053,6 @@ h1 {
 
   .repeat-button {
     width: auto;
-  }
-
-  .material-toc {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .material-pagination {

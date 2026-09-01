@@ -117,8 +117,14 @@ test("opens the consent material and moves through its carousel", async ({ page 
     page.getByRole("heading", { name: "Що важливо знати про згоду" }),
   ).toBeVisible();
 
-  const contents = page.getByRole("navigation", { name: "Зміст матеріалу" });
-  await contents.getByRole("button", { name: "5 складових згоди" }).click();
+  await expect(
+    page.getByRole("navigation", { name: "Зміст матеріалу" }),
+  ).toHaveCount(0);
+
+  await page
+    .getByRole("heading", { name: "5 складових згоди" })
+    .getByRole("button")
+    .click();
 
   await expect(
     page.getByRole("progressbar", { name: "Складова 1 із 5" }),
@@ -130,8 +136,9 @@ test("opens the consent material and moves through its carousel", async ({ page 
     page.getByRole("heading", { name: "2. Чітка й поінформована" }),
   ).toBeVisible();
 
-  await contents
-    .getByRole("button", { name: "Як запитувати й перевіряти згоду" })
+  await page
+    .getByRole("heading", { name: "Як запитувати й перевіряти згоду" })
+    .getByRole("button")
     .click();
 
   await expect(
@@ -144,6 +151,13 @@ test("opens the consent material and moves through its carousel", async ({ page 
       .getByRole("heading", { name: "Як запитувати й перевіряти згоду" })
       .getByRole("button"),
   ).toHaveAttribute("aria-expanded", "true");
+
+  const openedSectionTop = await page.locator("#checking-consent").evaluate(
+    (section) => Math.round(section.getBoundingClientRect().top),
+  );
+  expect(openedSectionTop).toBeGreaterThanOrEqual(0);
+  expect(openedSectionTop).toBeLessThanOrEqual(24);
+
   await expect(
     page.getByRole("navigation", { name: "Навігація між матеріалами" }),
   ).toHaveCount(0);

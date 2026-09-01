@@ -3,14 +3,11 @@ import { Link } from "react-router-dom";
 import { AppMenu } from "../components/AppMenu";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
-const consentSections = [
-  { id: "consent-components", label: "5 складових згоди" },
-  { id: "checking-consent", label: "Як запитувати й перевіряти згоду" },
-  { id: "declining-consent", label: "Якщо відмовляєшся ти" },
-  { id: "receiving-decline", label: "Якщо відмовили тобі" },
-] as const;
-
-type ConsentSectionId = (typeof consentSections)[number]["id"];
+type ConsentSectionId =
+  | "consent-components"
+  | "checking-consent"
+  | "declining-consent"
+  | "receiving-decline";
 
 const consentPrinciples = [
   {
@@ -191,7 +188,12 @@ export function ConsentMaterialPage() {
     titleRef.current?.focus({ preventScroll: true });
   }, []);
 
-  const moveToSection = (id: ConsentSectionId) => {
+  const toggleSection = (id: ConsentSectionId) => {
+    if (openSection === id) {
+      setOpenSection(null);
+      return;
+    }
+
     setOpenSection(id);
     window.requestAnimationFrame(() => {
       const section = document.getElementById(id);
@@ -204,10 +206,6 @@ export function ConsentMaterialPage() {
       });
       trigger.focus({ preventScroll: true });
     });
-  };
-
-  const toggleSection = (id: ConsentSectionId) => {
-    setOpenSection((current) => (current === id ? null : id));
   };
 
   return (
@@ -239,19 +237,6 @@ export function ConsentMaterialPage() {
               </p>
             </div>
           </header>
-
-          <nav aria-label="Зміст матеріалу" className="material-toc">
-            {consentSections.map((section) => (
-              <button
-                key={section.id}
-                onClick={() => moveToSection(section.id)}
-                type="button"
-              >
-                <span>{section.label}</span>
-                <span aria-hidden="true">↓</span>
-              </button>
-            ))}
-          </nav>
 
           <ConsentDisclosureSection
             id="consent-components"

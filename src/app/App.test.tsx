@@ -64,9 +64,14 @@ describe("consent material", () => {
       screen.getByRole("heading", { name: "Що важливо знати про згоду" }),
     ).toBeVisible();
 
-    const contents = screen.getByRole("navigation", { name: "Зміст матеріалу" });
+    expect(
+      screen.queryByRole("navigation", { name: "Зміст матеріалу" }),
+    ).not.toBeInTheDocument();
+
     await user.click(
-      within(contents).getByRole("button", { name: "5 складових згоди" }),
+      within(
+        screen.getByRole("heading", { name: "5 складових згоди" }),
+      ).getByRole("button"),
     );
 
     expect(
@@ -86,9 +91,11 @@ describe("consent material", () => {
     ).toBeVisible();
 
     await user.click(
-      within(contents).getByRole("button", {
-        name: "Як запитувати й перевіряти згоду",
-      }),
+      within(
+        screen.getByRole("heading", {
+          name: "Як запитувати й перевіряти згоду",
+        }),
+      ).getByRole("button"),
     );
 
     expect(
