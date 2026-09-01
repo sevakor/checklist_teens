@@ -116,6 +116,10 @@ test("opens the consent material and moves through its carousel", async ({ page 
   await expect(
     page.getByRole("heading", { name: "Що важливо знати про згоду" }),
   ).toBeVisible();
+
+  const contents = page.getByRole("navigation", { name: "Зміст матеріалу" });
+  await contents.getByRole("button", { name: "5 складових згоди" }).click();
+
   await expect(
     page.getByRole("progressbar", { name: "Складова 1 із 5" }),
   ).toBeVisible();
@@ -125,9 +129,24 @@ test("opens the consent material and moves through its carousel", async ({ page 
   await expect(
     page.getByRole("heading", { name: "2. Чітка й поінформована" }),
   ).toBeVisible();
+
+  await contents
+    .getByRole("button", { name: "Як запитувати й перевіряти згоду" })
+    .click();
+
   await expect(
-    page.getByRole("link", { name: "Наступне" }),
-  ).toHaveAttribute("href", "#/materials/sex-myths");
+    page
+      .getByRole("heading", { name: "5 складових згоди" })
+      .getByRole("button"),
+  ).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    page
+      .getByRole("heading", { name: "Як запитувати й перевіряти згоду" })
+      .getByRole("button"),
+  ).toHaveAttribute("aria-expanded", "true");
+  await expect(
+    page.getByRole("navigation", { name: "Навігація між матеріалами" }),
+  ).toHaveCount(0);
 
   await page.addScriptTag({ content: axe.source });
   const result = await page.evaluate(() =>

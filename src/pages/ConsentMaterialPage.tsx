@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { AppMenu } from "../components/AppMenu";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
@@ -9,6 +9,8 @@ const consentSections = [
   { id: "declining-consent", label: "Якщо відмовляєшся ти" },
   { id: "receiving-decline", label: "Якщо відмовили тобі" },
 ] as const;
+
+type ConsentSectionId = (typeof consentSections)[number]["id"];
 
 const consentPrinciples = [
   {
@@ -50,7 +52,6 @@ const consentPrinciples = [
 
 function ConsentPrinciplesCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const activePrinciple = consentPrinciples[activeIndex];
   const position = activeIndex + 1;
 
   return (
@@ -79,21 +80,33 @@ function ConsentPrinciplesCarousel() {
         </div>
       </div>
 
-      <article
+      <div
         aria-atomic="true"
         aria-live="polite"
-        className="consent-carousel-slide"
-        id="consent-carousel-slide"
+        className="consent-carousel-slides"
+        id="consent-carousel-slides"
       >
-        <h3>{activePrinciple.title}</h3>
-        {activePrinciple.paragraphs.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
-      </article>
+        {consentPrinciples.map((principle, index) => {
+          const active = index === activeIndex;
+
+          return (
+            <article
+              aria-hidden={!active}
+              className={`consent-carousel-slide${active ? " is-active" : ""}`}
+              key={principle.title}
+            >
+              <h3>{principle.title}</h3>
+              {principle.paragraphs.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </article>
+          );
+        })}
+      </div>
 
       <div className="consent-carousel-actions">
         <button
-          aria-controls="consent-carousel-slide"
+          aria-controls="consent-carousel-slides"
           className="secondary-button"
           disabled={activeIndex === 0}
           onClick={() => setActiveIndex((index) => Math.max(0, index - 1))}
@@ -102,7 +115,7 @@ function ConsentPrinciplesCarousel() {
           Назад
         </button>
         <button
-          aria-controls="consent-carousel-slide"
+          aria-controls="consent-carousel-slides"
           className="primary-button"
           disabled={activeIndex === consentPrinciples.length - 1}
           onClick={() =>
@@ -119,9 +132,58 @@ function ConsentPrinciplesCarousel() {
   );
 }
 
+type ConsentDisclosureSectionProps = {
+  children: ReactNode;
+  id: ConsentSectionId;
+  open: boolean;
+  onToggle: () => void;
+  prose?: boolean;
+  title: string;
+};
+
+function ConsentDisclosureSection({
+  children,
+  id,
+  open,
+  onToggle,
+  prose = false,
+  title,
+}: ConsentDisclosureSectionProps) {
+  const headingId = `${id}-heading`;
+  const panelId = `${id}-panel`;
+
+  return (
+    <section className="material-section material-disclosure-section" id={id}>
+      <h2 id={headingId}>
+        <button
+          aria-controls={panelId}
+          aria-expanded={open}
+          onClick={onToggle}
+          type="button"
+        >
+          <span>{title}</span>
+          <span aria-hidden="true" className="material-disclosure-arrow">
+            ↓
+          </span>
+        </button>
+      </h2>
+      <div
+        aria-labelledby={headingId}
+        className={`material-disclosure-panel${prose ? " material-prose" : ""}`}
+        hidden={!open}
+        id={panelId}
+        role="region"
+      >
+        {children}
+      </div>
+    </section>
+  );
+}
+
 export function ConsentMaterialPage() {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const [openSection, setOpenSection] = useState<ConsentSectionId | null>(null);
 
   useEffect(() => {
     document.title = "Згода — корисні матеріали";
@@ -129,15 +191,23 @@ export function ConsentMaterialPage() {
     titleRef.current?.focus({ preventScroll: true });
   }, []);
 
-  const moveToSection = (id: string) => {
-    const heading = document.getElementById(id);
-    if (!heading) return;
+  const moveToSection = (id: ConsentSectionId) => {
+    setOpenSection(id);
+    window.requestAnimationFrame(() => {
+      const section = document.getElementById(id);
+      const trigger = section?.querySelector("button");
+      if (!section || !(trigger instanceof HTMLButtonElement)) return;
 
-    heading.scrollIntoView({
-      behavior: prefersReducedMotion ? "auto" : "smooth",
-      block: "start",
+      section.scrollIntoView?.({
+        behavior: prefersReducedMotion ? "auto" : "smooth",
+        block: "start",
+      });
+      trigger.focus({ preventScroll: true });
     });
-    heading.focus({ preventScroll: true });
+  };
+
+  const toggleSection = (id: ConsentSectionId) => {
+    setOpenSection((current) => (current === id ? null : id));
   };
 
   return (
@@ -152,7 +222,6 @@ export function ConsentMaterialPage() {
       <main className="material-article-page">
         <article>
           <header className="material-article-intro">
-            <p className="eyebrow">Корисні матеріали</p>
             <h1 ref={titleRef} tabIndex={-1}>
               Що важливо знати про згоду
             </h1>
@@ -184,17 +253,22 @@ export function ConsentMaterialPage() {
             ))}
           </nav>
 
-          <section className="material-section">
-            <h2 id="consent-components" tabIndex={-1}>
-              5 складових згоди
-            </h2>
+          <ConsentDisclosureSection
+            id="consent-components"
+            onToggle={() => toggleSection("consent-components")}
+            open={openSection === "consent-components"}
+            title="5 складових згоди"
+          >
             <ConsentPrinciplesCarousel />
-          </section>
+          </ConsentDisclosureSection>
 
-          <section className="material-section material-prose">
-            <h2 id="checking-consent" tabIndex={-1}>
-              Як запитувати й перевіряти згоду
-            </h2>
+          <ConsentDisclosureSection
+            id="checking-consent"
+            onToggle={() => toggleSection("checking-consent")}
+            open={openSection === "checking-consent"}
+            prose
+            title="Як запитувати й перевіряти згоду"
+          >
             <p>
               Запитання про згоду не має бути незручним або надто формальним.
               Можна говорити прямо і природно:
@@ -225,12 +299,15 @@ export function ConsentMaterialPage() {
                 Перевіряй згоду знову, якщо взаємодія змінюється або триває далі
               </li>
             </ul>
-          </section>
+          </ConsentDisclosureSection>
 
-          <section className="material-section material-prose">
-            <h2 id="declining-consent" tabIndex={-1}>
-              Якщо відмовляєшся ти
-            </h2>
+          <ConsentDisclosureSection
+            id="declining-consent"
+            onToggle={() => toggleSection("declining-consent")}
+            open={openSection === "declining-consent"}
+            prose
+            title="Якщо відмовляєшся ти"
+          >
             <p>
               Ти маєш право відмовитися від будь-якої дії або зупинитися будь-якої
               миті. Для цього не потрібні «достатньо серйозна» причина чи
@@ -258,12 +335,15 @@ export function ConsentMaterialPage() {
               означає, що ти погодився/лася. Відповідальність за порушення твоїх меж
               несе людина, яка їх не поважала, а не ти
             </p>
-          </section>
+          </ConsentDisclosureSection>
 
-          <section className="material-section material-prose">
-            <h2 id="receiving-decline" tabIndex={-1}>
-              Якщо відмовили тобі
-            </h2>
+          <ConsentDisclosureSection
+            id="receiving-decline"
+            onToggle={() => toggleSection("receiving-decline")}
+            open={openSection === "receiving-decline"}
+            prose
+            title="Якщо відмовили тобі"
+          >
             <p>
               Зупинися одразу. Не тисни, не вмовляй, не питай знову й знову, не
               ображай і не змушуй людину почуватися винною. Відмова не є запрошенням
@@ -289,20 +369,8 @@ export function ConsentMaterialPage() {
               близьких стосунках ніхто не зобов’язаний погоджуватися на дотики чи
               секс
             </p>
-          </section>
+          </ConsentDisclosureSection>
         </article>
-
-        <nav aria-label="Навігація між матеріалами" className="material-pagination">
-          <button className="secondary-button" disabled type="button">
-            Попереднє
-          </button>
-          <Link className="secondary-button" to="/materials">
-            Зміст
-          </Link>
-          <Link className="primary-button" to="/materials/sex-myths">
-            Наступне
-          </Link>
-        </nav>
       </main>
     </div>
   );

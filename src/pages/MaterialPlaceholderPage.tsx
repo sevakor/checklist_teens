@@ -24,7 +24,6 @@ export function MaterialPlaceholderPage() {
         <span aria-hidden="true">←</span> Усі матеріали
       </Link>
       <div className="article-placeholder-content">
-        <p className="eyebrow">Корисні матеріали</p>
         <h1>{title}</h1>
         <p>
           Структуру цього матеріалу вже закладено. Текстові блоки, спойлери й

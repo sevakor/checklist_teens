@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
@@ -63,6 +63,12 @@ describe("consent material", () => {
     expect(
       screen.getByRole("heading", { name: "Що важливо знати про згоду" }),
     ).toBeVisible();
+
+    const contents = screen.getByRole("navigation", { name: "Зміст матеріалу" });
+    await user.click(
+      within(contents).getByRole("button", { name: "5 складових згоди" }),
+    );
+
     expect(
       screen.getByRole("progressbar", { name: "Складова 1 із 5" }),
     ).toBeVisible();
@@ -78,13 +84,39 @@ describe("consent material", () => {
     expect(
       screen.getByRole("heading", { name: "2. Чітка й поінформована" }),
     ).toBeVisible();
-    expect(screen.getByRole("link", { name: "Зміст" })).toHaveAttribute(
+
+    await user.click(
+      within(contents).getByRole("button", {
+        name: "Як запитувати й перевіряти згоду",
+      }),
+    );
+
+    expect(
+      within(
+        screen.getByRole("heading", { name: "5 складових згоди" }),
+      ).getByRole("button"),
+    ).toHaveAttribute("aria-expanded", "false");
+    expect(
+      within(
+        screen.getByRole("heading", {
+          name: "Як запитувати й перевіряти згоду",
+        }),
+      ).getByRole("button"),
+    ).toHaveAttribute("aria-expanded", "true");
+    expect(
+      screen.queryByRole("navigation", { name: "Навігація між матеріалами" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("progressbar", { name: "Складова 2 із 5" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText("«Можна тебе поцілувати?»"),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "Усі матеріали" }),
+    ).toHaveAttribute(
       "href",
       "/materials",
-    );
-    expect(screen.getByRole("link", { name: "Наступне" })).toHaveAttribute(
-      "href",
-      "/materials/sex-myths",
     );
   });
 });
