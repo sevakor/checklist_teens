@@ -21,9 +21,6 @@ importers:
       '@eslint/js':
         specifier: ^9.34.0
         version: 9.39.5
-      '@openai/sites-vite-plugin':
-        specifier: ^0.2.0
-        version: 0.2.0(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2))
       '@playwright/test':
         specifier: ^1.55.0
         version: 1.62.1
@@ -343,12 +340,6 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
-
-  '@openai/sites-vite-plugin@0.2.0':
-    resolution: {integrity: sha512-4ThLMW9eaf2gd+SqBwHmqBONKBAbQ2BuOFev7mHq7Y2W5mm/rfVJOSjcgQIsY2PqdXxXNZ4Yd0+s0DlSUYehag==}
-    engines: {node: '>=22.13.0'}
-    peerDependencies:
-      vite: ^8.0.0
 
   '@oxc-project/types@0.147.0':
     resolution: {integrity: sha512-IJ3s6ltHLp45S0bh7phkX+gJO7A1Wuz2EaqpAhb8WjqDwbzMiWKHhyyT42tskaWjEYXtHtVCPpnBJVT9+dcRLg==}
@@ -1646,10 +1637,6 @@ snapshots:
   '@humanwhocodes/retry@0.4.3': {}
 
   '@jridgewell/sourcemap-codec@1.6.0': {}
-
-  '@openai/sites-vite-plugin@0.2.0(vite@8.2.2(@types/node@24.13.3)(esbuild@0.28.2))':
-    dependencies:
-      vite: 8.2.2(@types/node@24.13.3)(esbuild@0.28.2)
 
   '@oxc-project/types@0.147.0': {}
 
