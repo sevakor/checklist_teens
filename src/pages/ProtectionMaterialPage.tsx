@@ -116,6 +116,7 @@ export function ProtectionMaterialPage() {
                 >
                   <MarkdownBlocks
                     blocks={section.blocks}
+                    boldFirstSentenceInListItems
                     listClassName="protection-point-list"
                     quoteClassName="protection-emergency-callout"
                   />

@@ -1157,6 +1157,10 @@ h1 {
   line-height: 1.62;
 }
 
+.protection-point-list li > strong:first-child {
+  font-weight: 800;
+}
+
 .protection-section-panel > p {
   max-width: 64ch;
   margin: 20px 0 0;

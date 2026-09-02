@@ -234,7 +234,14 @@ describe("protection material", () => {
       /Після першої менструації кожній дівчині корисно відстежувати свій цикл/,
     );
     expect(firstPoint).toBeVisible();
-    expect(firstPoint.closest("ul")).toHaveClass("protection-point-list");
+    const firstPointCard = firstPoint.closest("li");
+    expect(firstPointCard?.closest("ul")).toHaveClass("protection-point-list");
+    expect(firstPointCard?.querySelector("strong")).toHaveTextContent(
+      "Після першої менструації кожній дівчині корисно відстежувати свій цикл у зручний для себе спосіб.",
+    );
+    expect(firstPointCard?.querySelector("strong")).not.toHaveTextContent(
+      "Це допомагає зрозуміти",
+    );
 
     await user.click(condomChoiceButton);
 

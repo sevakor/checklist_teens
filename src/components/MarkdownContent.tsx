@@ -32,12 +32,29 @@ function renderInlineMarkdown(content: string): ReactNode[] {
 
 type MarkdownBlocksProps = {
   blocks: MarkdownBlock[];
+  boldFirstSentenceInListItems?: boolean;
   listClassName?: string;
   quoteClassName?: string;
 };
 
+function renderListItem(content: string, boldFirstSentence: boolean) {
+  if (!boldFirstSentence) return renderInlineMarkdown(content);
+
+  const firstSentenceMatch = content.match(/^(.+?[.!?])(?=\s|$)/);
+  const firstSentence = firstSentenceMatch?.[1] ?? content;
+  const remainder = content.slice(firstSentence.length);
+
+  return (
+    <>
+      <strong>{renderInlineMarkdown(firstSentence)}</strong>
+      {renderInlineMarkdown(remainder)}
+    </>
+  );
+}
+
 export function MarkdownBlocks({
   blocks,
+  boldFirstSentenceInListItems = false,
   listClassName,
   quoteClassName,
 }: MarkdownBlocksProps) {
@@ -46,7 +63,9 @@ export function MarkdownBlocks({
       return (
         <ul className={listClassName} key={`list-${index}`}>
           {block.items.map((item) => (
-            <li key={item}>{renderInlineMarkdown(item)}</li>
+            <li key={item}>
+              {renderListItem(item, boldFirstSentenceInListItems)}
+            </li>
           ))}
         </ul>
       );

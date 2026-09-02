@@ -276,11 +276,12 @@ test("opens protection sections with card points and collapsed sources", async (
   });
   await cycleHeading.getByRole("button").click();
 
-  const firstPoint = page.getByText(
-    /Після першої менструації кожній дівчині корисно відстежувати свій цикл/,
-  );
+  const firstPoint = page.locator(".protection-point-list li").first();
   await expect(firstPoint).toBeVisible();
   await expect(firstPoint).toHaveCSS("border-top-style", "solid");
+  await expect(firstPoint.locator("strong")).toHaveText(
+    "Після першої менструації кожній дівчині корисно відстежувати свій цикл у зручний для себе спосіб.",
+  );
 
   await condomChoiceHeading.getByRole("button").click();
   await expect(cycleHeading.getByRole("button")).toHaveAttribute(
