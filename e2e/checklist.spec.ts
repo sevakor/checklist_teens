@@ -173,3 +173,73 @@ test("opens the consent material and moves through its carousel", async ({ page 
     ),
   ).toEqual([]);
 });
+
+test("filters sex myths into groups and opens bordered cards", async ({ page }) => {
+  await page.goto("/#/materials/sex-myths");
+
+  await expect(page.getByRole("heading", { name: "Міфи про секс" })).toBeVisible();
+
+  const categoryPicker = page.getByRole("group", { name: "Групи міфів" });
+  const expectationsButton = categoryPicker.getByRole("button", {
+    name: "Очікування й стереотипи",
+  });
+  await expect(expectationsButton).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("heading", {
+      name: "Міф 1. «У певному віці всі вже цим займаються»",
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Міф 7. «Про секс не потрібно говорити заздалегідь — це зіпсує момент»",
+    }),
+  ).toHaveCount(0);
+
+  const consentSignalsButton = categoryPicker.getByRole("button", {
+    name: "Згода й сигнали",
+  });
+  await consentSignalsButton.click();
+  await expect(consentSignalsButton).toHaveAttribute("aria-pressed", "true");
+
+  const seventhMythHeading = page.getByRole("heading", {
+    name: "Міф 7. «Про секс не потрібно говорити заздалегідь — це зіпсує момент»",
+  });
+  await seventhMythHeading.getByRole("button").click();
+  await expect(
+    page.getByText(/спокійна розмова до близькості допомагає зрозуміти бажання/),
+  ).toBeVisible();
+
+  const seventhCard = page.locator("#sex-myth-7");
+  await expect(seventhCard).toHaveCSS("border-top-style", "solid");
+  await expect(seventhCard).toHaveCSS("border-top-width", "1px");
+
+  const eighthMythHeading = page.getByRole("heading", {
+    name: "Міф 8. «Якщо вже почали, потрібно довести справу до кінця»",
+  });
+  await eighthMythHeading.getByRole("button").click();
+  await expect(seventhMythHeading.getByRole("button")).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
+  await expect(eighthMythHeading.getByRole("button")).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
+
+  const openedCardTop = await page.locator("#sex-myth-8").evaluate((card) =>
+    Math.round(card.getBoundingClientRect().top),
+  );
+  expect(openedCardTop).toBeGreaterThanOrEqual(0);
+  expect(openedCardTop).toBeLessThanOrEqual(24);
+
+  await page.addScriptTag({ content: axe.source });
+  const result = await page.evaluate(() =>
+    (window as unknown as WindowWithAxe).axe.run(document),
+  );
+
+  expect(
+    result.violations.filter((violation) =>
+      ["critical", "serious"].includes(violation.impact ?? ""),
+    ),
+  ).toEqual([]);
+});

@@ -127,3 +127,66 @@ describe("consent material", () => {
     );
   });
 });
+
+describe("sex myths material", () => {
+  it("groups the myths and opens only one card at a time", async () => {
+    const user = userEvent.setup();
+    renderApp("/materials/sex-myths");
+
+    expect(screen.getByRole("heading", { name: "Міфи про секс" })).toBeVisible();
+    expect(
+      screen.getByText(/Секс часто обростає міфами з розмов із друзями/),
+    ).toBeVisible();
+
+    const categoryPicker = screen.getByRole("group", { name: "Групи міфів" });
+    expect(
+      within(categoryPicker).getByRole("button", {
+        name: "Очікування й стереотипи",
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("heading", {
+        name: "Міф 1. «У певному віці всі вже цим займаються»",
+      }),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("heading", {
+        name: "Міф 7. «Про секс не потрібно говорити заздалегідь — це зіпсує момент»",
+      }),
+    ).not.toBeInTheDocument();
+
+    const firstMythButton = within(
+      screen.getByRole("heading", {
+        name: "Міф 1. «У певному віці всі вже цим займаються»",
+      }),
+    ).getByRole("button");
+    await user.click(firstMythButton);
+
+    expect(firstMythButton).toHaveAttribute("aria-expanded", "true");
+    expect(
+      screen.getByText(/немає віку, до якого людина «має встигнути»/),
+    ).toBeVisible();
+
+    await user.click(
+      within(categoryPicker).getByRole("button", {
+        name: "Згода й сигнали",
+      }),
+    );
+
+    expect(
+      screen.queryByRole("heading", {
+        name: "Міф 1. «У певному віці всі вже цим займаються»",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: "Міф 7. «Про секс не потрібно говорити заздалегідь — це зіпсує момент»",
+      }),
+    ).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Що справді важливо" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Джерела" })).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: "ВООЗ: сексуальне здоров’я" }),
+    ).toHaveAttribute("href", "https://www.who.int/health-topics/sexual-health");
+  });
+});
