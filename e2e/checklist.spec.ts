@@ -232,6 +232,21 @@ test("filters sex myths into groups and opens bordered cards", async ({ page }) 
   expect(openedCardTop).toBeGreaterThanOrEqual(0);
   expect(openedCardTop).toBeLessThanOrEqual(24);
 
+  const sourcesButton = page
+    .getByRole("heading", { name: "Джерела" })
+    .getByRole("button");
+  await expect(sourcesButton).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    page.getByRole("link", { name: "ВООЗ: сексуальне здоров’я" }),
+  ).toHaveCount(0);
+
+  await sourcesButton.click();
+
+  await expect(sourcesButton).toHaveAttribute("aria-expanded", "true");
+  await expect(
+    page.getByRole("link", { name: "ВООЗ: сексуальне здоров’я" }),
+  ).toBeVisible();
+
   await page.addScriptTag({ content: axe.source });
   const result = await page.evaluate(() =>
     (window as unknown as WindowWithAxe).axe.run(document),

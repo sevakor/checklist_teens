@@ -217,6 +217,7 @@ export function SexMythsMaterialPage() {
   const [activeCategoryId, setActiveCategoryId] =
     useState<MythCategoryId>("expectations");
   const [openMythIndex, setOpenMythIndex] = useState<number | null>(null);
+  const [sourcesOpen, setSourcesOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Міфи про секс — корисні матеріали";
@@ -347,8 +348,26 @@ export function SexMythsMaterialPage() {
 
           {sourcesSection ? (
             <section className="material-section myths-sources-section">
-              <h2>{sourcesSection.title}</h2>
-              <div className="material-prose myths-sources-list">
+              <h2 id="myths-sources-heading">
+                <button
+                  aria-controls="myths-sources-panel"
+                  aria-expanded={sourcesOpen}
+                  onClick={() => setSourcesOpen((open) => !open)}
+                  type="button"
+                >
+                  <span>{sourcesSection.title}</span>
+                  <span aria-hidden="true" className="myths-sources-arrow">
+                    ↓
+                  </span>
+                </button>
+              </h2>
+              <div
+                aria-labelledby="myths-sources-heading"
+                className="material-prose myths-sources-list"
+                hidden={!sourcesOpen}
+                id="myths-sources-panel"
+                role="region"
+              >
                 <MarkdownBlocks blocks={sourcesSection.blocks} />
               </div>
             </section>

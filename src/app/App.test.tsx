@@ -185,6 +185,18 @@ describe("sex myths material", () => {
     ).toBeVisible();
     expect(screen.getByRole("heading", { name: "Що справді важливо" })).toBeVisible();
     expect(screen.getByRole("heading", { name: "Джерела" })).toBeVisible();
+
+    const sourcesButton = within(
+      screen.getByRole("heading", { name: "Джерела" }),
+    ).getByRole("button");
+    expect(sourcesButton).toHaveAttribute("aria-expanded", "false");
+    expect(
+      screen.queryByRole("link", { name: "ВООЗ: сексуальне здоров’я" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(sourcesButton);
+
+    expect(sourcesButton).toHaveAttribute("aria-expanded", "true");
     expect(
       screen.getByRole("link", { name: "ВООЗ: сексуальне здоров’я" }),
     ).toHaveAttribute("href", "https://www.who.int/health-topics/sexual-health");

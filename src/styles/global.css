@@ -1087,8 +1087,44 @@ h1 {
   background: #fff0c9;
 }
 
+.myths-sources-section {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.myths-sources-section h2 button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  min-height: 76px;
+  border: 0;
+  padding: 22px 0;
+  color: var(--text);
+  background: transparent;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.myths-sources-arrow {
+  color: var(--accent);
+  font-size: 1.7rem;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+.myths-sources-section h2 button[aria-expanded="true"]
+  .myths-sources-arrow {
+  transform: rotate(180deg);
+}
+
 .myths-sources-list {
-  margin-top: 22px;
+  padding-bottom: 30px;
 }
 
 .myths-sources-list a {
