@@ -7,6 +7,7 @@ import { ConsentMaterialPage } from "../pages/ConsentMaterialPage";
 import { EntryRedirect } from "../pages/EntryRedirect";
 import { MaterialPlaceholderPage } from "../pages/MaterialPlaceholderPage";
 import { MaterialsCatalog } from "../pages/MaterialsCatalog";
+import { ProtectionMaterialPage } from "../pages/ProtectionMaterialPage";
 import { SexMythsMaterialPage } from "../pages/SexMythsMaterialPage";
 import { StartPage } from "../pages/StartPage";
 
@@ -26,6 +27,7 @@ export function App() {
         <Route path="/materials" element={<MaterialsCatalog />} />
         <Route path="/materials/consent" element={<ConsentMaterialPage />} />
         <Route path="/materials/sex-myths" element={<SexMythsMaterialPage />} />
+        <Route path="/materials/protection" element={<ProtectionMaterialPage />} />
         <Route
           path="/materials/:materialSlug"
           element={<MaterialPlaceholderPage />}

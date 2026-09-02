@@ -1,17 +1,14 @@
-import { type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import sexMythsGuide from "../../sex-myths-guide.md?raw";
 import { AppMenu } from "../components/AppMenu";
+import { MarkdownBlocks } from "../components/MarkdownContent";
+import { MaterialSourcesDisclosure } from "../components/MaterialSourcesDisclosure";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
-
-type MarkdownBlock =
-  | { content: string; type: "paragraph" }
-  | { items: string[]; type: "list" };
-
-type GuideSection = {
-  blocks: MarkdownBlock[];
-  title: string;
-};
+import {
+  type MarkdownSection,
+  parseMarkdownGuide,
+} from "../utils/parseMarkdownGuide";
 
 type MythCategoryId =
   | "expectations"
@@ -45,68 +42,7 @@ const mythCategories: MythCategory[] = [
   { end: 22, id: "pleasure", label: "Задоволення", start: 20 },
 ];
 
-function parseBlocks(lines: string[]): MarkdownBlock[] {
-  const blocks: MarkdownBlock[] = [];
-  let paragraphLines: string[] = [];
-  let listItems: string[] = [];
-
-  const flushParagraph = () => {
-    if (paragraphLines.length === 0) return;
-    blocks.push({ content: paragraphLines.join(" "), type: "paragraph" });
-    paragraphLines = [];
-  };
-
-  const flushList = () => {
-    if (listItems.length === 0) return;
-    blocks.push({ items: listItems, type: "list" });
-    listItems = [];
-  };
-
-  lines.forEach((rawLine) => {
-    const line = rawLine.trim();
-
-    if (!line) {
-      flushParagraph();
-      return;
-    }
-
-    if (line.startsWith("- ")) {
-      flushParagraph();
-      listItems.push(line.slice(2));
-      return;
-    }
-
-    flushList();
-    paragraphLines.push(line);
-  });
-
-  flushParagraph();
-  flushList();
-  return blocks;
-}
-
-function parseGuide(source: string) {
-  const lines = source.trim().split(/\r?\n/);
-  const title = lines[0].replace(/^#\s+/, "");
-  const headingIndexes = lines.reduce<number[]>((indexes, line, index) => {
-    if (line.startsWith("## ")) indexes.push(index);
-    return indexes;
-  }, []);
-  const firstHeadingIndex = headingIndexes[0] ?? lines.length;
-  const intro = parseBlocks(lines.slice(1, firstHeadingIndex));
-  const sections = headingIndexes.map((headingIndex, index) => {
-    const nextHeadingIndex = headingIndexes[index + 1] ?? lines.length;
-
-    return {
-      blocks: parseBlocks(lines.slice(headingIndex + 1, nextHeadingIndex)),
-      title: lines[headingIndex].replace(/^##\s+/, ""),
-    } satisfies GuideSection;
-  });
-
-  return { intro, sections, title };
-}
-
-const guide = parseGuide(sexMythsGuide);
+const guide = parseMarkdownGuide(sexMythsGuide);
 const mythSections = guide.sections.filter((section) =>
   section.title.startsWith("Міф "),
 );
@@ -117,58 +53,11 @@ const sourcesSection = guide.sections.find(
   (section) => section.title === "Джерела",
 );
 
-function renderInlineMarkdown(content: string): ReactNode[] {
-  const tokenPattern = /(\*\*[^*]+\*\*|\[[^\]]+\]\([^)]+\))/g;
-
-  return content
-    .split(tokenPattern)
-    .filter(Boolean)
-    .map((part, index) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
-        return <strong key={`${part}-${index}`}>{part.slice(2, -2)}</strong>;
-      }
-
-      const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
-      if (linkMatch) {
-        return (
-          <a
-            href={linkMatch[2]}
-            key={`${linkMatch[2]}-${index}`}
-            rel="noreferrer"
-            target="_blank"
-          >
-            {linkMatch[1]}
-          </a>
-        );
-      }
-
-      return part;
-    });
-}
-
-function MarkdownBlocks({ blocks }: { blocks: MarkdownBlock[] }) {
-  return blocks.map((block, index) => {
-    if (block.type === "list") {
-      return (
-        <ul key={`list-${index}`}>
-          {block.items.map((item) => (
-            <li key={item}>{renderInlineMarkdown(item)}</li>
-          ))}
-        </ul>
-      );
-    }
-
-    return (
-      <p key={`paragraph-${index}`}>{renderInlineMarkdown(block.content)}</p>
-    );
-  });
-}
-
 type MythCardProps = {
   index: number;
   onToggle: () => void;
   open: boolean;
-  section: GuideSection;
+  section: MarkdownSection;
 };
 
 function MythCard({ index, onToggle, open, section }: MythCardProps) {
@@ -217,7 +106,6 @@ export function SexMythsMaterialPage() {
   const [activeCategoryId, setActiveCategoryId] =
     useState<MythCategoryId>("expectations");
   const [openMythIndex, setOpenMythIndex] = useState<number | null>(null);
-  const [sourcesOpen, setSourcesOpen] = useState(false);
 
   useEffect(() => {
     document.title = "Міфи про секс — корисні матеріали";
@@ -347,30 +235,11 @@ export function SexMythsMaterialPage() {
           ) : null}
 
           {sourcesSection ? (
-            <section className="material-section myths-sources-section">
-              <h2 id="myths-sources-heading">
-                <button
-                  aria-controls="myths-sources-panel"
-                  aria-expanded={sourcesOpen}
-                  onClick={() => setSourcesOpen((open) => !open)}
-                  type="button"
-                >
-                  <span>{sourcesSection.title}</span>
-                  <span aria-hidden="true" className="myths-sources-arrow">
-                    ↓
-                  </span>
-                </button>
-              </h2>
-              <div
-                aria-labelledby="myths-sources-heading"
-                className="material-prose myths-sources-list"
-                hidden={!sourcesOpen}
-                id="myths-sources-panel"
-                role="region"
-              >
-                <MarkdownBlocks blocks={sourcesSection.blocks} />
-              </div>
-            </section>
+            <MaterialSourcesDisclosure
+              blocks={sourcesSection.blocks}
+              idPrefix="myths"
+              title={sourcesSection.title}
+            />
           ) : null}
         </article>
       </main>

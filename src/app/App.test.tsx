@@ -202,3 +202,78 @@ describe("sex myths material", () => {
     ).toHaveAttribute("href", "https://www.who.int/health-topics/sexual-health");
   });
 });
+
+describe("protection material", () => {
+  it("shows the source sections as disclosures and the points as cards", async () => {
+    const user = userEvent.setup();
+    renderApp("/materials/protection");
+
+    expect(
+      screen.getByRole("heading", { name: "Що важливо знати про статевий акт" }),
+    ).toBeVisible();
+    expect(
+      screen.getByText(/Нижче зібрано важливу інформацію насамперед про захист/),
+    ).toBeVisible();
+
+    const cycleButton = within(
+      screen.getByRole("heading", {
+        name: "Менструальний цикл, фертильність і вагітність",
+      }),
+    ).getByRole("button");
+    const condomChoiceButton = within(
+      screen.getByRole("heading", {
+        name: "Вибір і зберігання презерватива",
+      }),
+    ).getByRole("button");
+
+    expect(cycleButton).toHaveAttribute("aria-expanded", "false");
+    await user.click(cycleButton);
+
+    expect(cycleButton).toHaveAttribute("aria-expanded", "true");
+    const firstPoint = screen.getByText(
+      /Після першої менструації кожній дівчині корисно відстежувати свій цикл/,
+    );
+    expect(firstPoint).toBeVisible();
+    expect(firstPoint.closest("ul")).toHaveClass("protection-point-list");
+
+    await user.click(condomChoiceButton);
+
+    expect(cycleButton).toHaveAttribute("aria-expanded", "false");
+    expect(condomChoiceButton).toHaveAttribute("aria-expanded", "true");
+    expect(
+      screen.getByText(/Презервативи можна купувати в аптеках, супермаркетах/),
+    ).toBeVisible();
+
+    const emergencyButton = within(
+      screen.getByRole("heading", {
+        name: "Якщо захисту не було або щось пішло не так",
+      }),
+    ).getByRole("button");
+    await user.click(emergencyButton);
+
+    expect(
+      screen.getByText(
+        /Таблетка екстреної контрацепції запобігає овуляції або відкладає її/,
+      ),
+    ).toBeVisible();
+
+    const sourcesButton = within(
+      screen.getByRole("heading", { name: "Джерела" }),
+    ).getByRole("button");
+    expect(sourcesButton).toHaveAttribute("aria-expanded", "false");
+    expect(
+      screen.queryByRole("link", { name: "ВООЗ: презервативи" }),
+    ).not.toBeInTheDocument();
+
+    await user.click(sourcesButton);
+
+    expect(sourcesButton).toHaveAttribute("aria-expanded", "true");
+    expect(emergencyButton).toHaveAttribute("aria-expanded", "true");
+    expect(
+      screen.getByRole("link", { name: "ВООЗ: презервативи" }),
+    ).toHaveAttribute(
+      "href",
+      "https://www.who.int/news-room/fact-sheets/detail/condoms",
+    );
+  });
+});

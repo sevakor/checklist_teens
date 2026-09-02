@@ -258,3 +258,79 @@ test("filters sex myths into groups and opens bordered cards", async ({ page }) 
     ),
   ).toEqual([]);
 });
+
+test("opens protection sections with card points and collapsed sources", async ({
+  page,
+}) => {
+  await page.goto("/#/materials/protection");
+
+  await expect(
+    page.getByRole("heading", { name: "Що важливо знати про статевий акт" }),
+  ).toBeVisible();
+
+  const cycleHeading = page.getByRole("heading", {
+    name: "Менструальний цикл, фертильність і вагітність",
+  });
+  const condomChoiceHeading = page.getByRole("heading", {
+    name: "Вибір і зберігання презерватива",
+  });
+  await cycleHeading.getByRole("button").click();
+
+  const firstPoint = page.getByText(
+    /Після першої менструації кожній дівчині корисно відстежувати свій цикл/,
+  );
+  await expect(firstPoint).toBeVisible();
+  await expect(firstPoint).toHaveCSS("border-top-style", "solid");
+
+  await condomChoiceHeading.getByRole("button").click();
+  await expect(cycleHeading.getByRole("button")).toHaveAttribute(
+    "aria-expanded",
+    "false",
+  );
+  await expect(condomChoiceHeading.getByRole("button")).toHaveAttribute(
+    "aria-expanded",
+    "true",
+  );
+
+  const openedSectionTop = await page
+    .locator("#choosing-storing-condoms")
+    .evaluate((section) => Math.round(section.getBoundingClientRect().top));
+  expect(openedSectionTop).toBeGreaterThanOrEqual(0);
+  expect(openedSectionTop).toBeLessThanOrEqual(24);
+
+  const emergencyHeading = page.getByRole("heading", {
+    name: "Якщо захисту не було або щось пішло не так",
+  });
+  await emergencyHeading.getByRole("button").click();
+  await expect(
+    page.getByText(
+      /Таблетка екстреної контрацепції запобігає овуляції або відкладає її/,
+    ),
+  ).toBeVisible();
+
+  const sourcesButton = page
+    .getByRole("heading", { name: "Джерела" })
+    .getByRole("button");
+  await expect(sourcesButton).toHaveAttribute("aria-expanded", "false");
+  await expect(
+    page.getByRole("link", { name: "ВООЗ: презервативи" }),
+  ).toHaveCount(0);
+
+  await sourcesButton.click();
+
+  await expect(sourcesButton).toHaveAttribute("aria-expanded", "true");
+  await expect(
+    page.getByRole("link", { name: "ВООЗ: презервативи" }),
+  ).toBeVisible();
+
+  await page.addScriptTag({ content: axe.source });
+  const result = await page.evaluate(() =>
+    (window as unknown as WindowWithAxe).axe.run(document),
+  );
+
+  expect(
+    result.violations.filter((violation) =>
+      ["critical", "serious"].includes(violation.impact ?? ""),
+    ),
+  ).toEqual([]);
+});
